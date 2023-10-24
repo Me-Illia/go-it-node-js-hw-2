@@ -6,12 +6,12 @@ const router = express.Router()
 
 router.get('/', contactsController.getAll);
 
-router.get('/:id', contactsController.getById);
+// router.get('/:id', contactsController.getById);
 
 router.post('/', contactsController.add);
 
-router.delete('/:id', contactsController.deleteById);
+// router.delete('/:id', contactsController.deleteById);
 
-router.put('/:id', contactsController.updateById);
+// router.put('/:id', contactsController.updateById);
 
 export default router;

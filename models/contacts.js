@@ -1,58 +1,62 @@
-// const fs = require('fs/promises') work only in CommonJS
+import { Schema, model } from "mongoose";
+import Joi from "joi";
 
-import fs from "fs/promises";
-import path from "path";
-import { nanoid } from "nanoid";
+import { handleSaveError } from "./hooks.js";
 
-const contactsPath = path.resolve("models", "contacts.json"); // знаходимо файл
-// const contactsPath = path.join(__dirname, "contacts.json") - work only in CommonJS
+const phoneRegexp = /^\(\d{3}\) \d{3}-\d{4}$/; // (123) 123-1234
 
-const updateContacts = contacts =>  fs.writeFile(contactsPath, JSON.stringify(contacts, null, 2)); // перезаписуємо файл
 
-export async function listContacts() {
-    // ...твій код. Повертає масив контактів.
-    const data = await fs.readFile(contactsPath, "utf-8"); // зчитуємо файл
-    return JSON.parse(data); 
-}
+const contactSchema = new Schema({
+    name: {
+        type: String,
+        required: [true, 'Set name for contact'],
+    },
+    email: {
+        type: String,
+    },
+    phone: {
+        type: String,
+        match: phoneRegexp,
+    },
+    favorite: {
+        type: Boolean,
+        default: false,
+    },
+});
 
-export async function getContactById(contactId) {
-    // ...твій код. Повертає об'єкт контакту з таким id. Повертає null, якщо контакт з таким id не знайдений.
-    const contacts = await listContacts();
-    const result = contacts.find(item => item.id === contactId);
-    return result || null;
-}
+contactSchema.post("save", handleSaveError); // хук на ерор для сервера
+     
+export const contactAddSchema = Joi.object({
+    name: Joi.string().required().messages({
+        "any.required": `"name" must be exist`,
+        "string.base": `"name" must be string`
+    }),
+    email: Joi.string().required().messages({
+        "any.required": `"email" must be exist`,
+        "string.base": `"email" must be string`
+    }),
+    phone: Joi.string().regex(phoneRegexp).required().messages({
+        "any.required": `"phone" must be exist`,
+        "string.base": `"phone" must be number. Example <(123) 123-1234>`,
+        "string.pattern.base": `"phone" not be valid. Example valid <(123) 123-1234>`
+    }),
+    favorite: Joi.boolean(),
+})
 
-export async function removeContact(contactId) {
-    // ...твій код. Повертає об'єкт видаленого контакту. Повертає null, якщо контакт з таким id не знайдений.
-    const contacts = await listContacts();
-    const index = contacts.findIndex(item => item.id == contactId);
-    if (index === - 1) {
-        return null;
-    } 
-    const [result] = contacts.splice(index, 1); 
-    await updateContacts(contacts) // перезаписуємо файл 
-    return result; // повертаємо видаленний елемент (це для логу при виконанні щоби показало - що саме видалили)
-}
+export const contactUpdateSchema = Joi.object({
+    name: Joi.string().messages({
+        "string.base": `"name" must be string`
+    }),
+    email: Joi.string().messages({
+        "string.base": `"email" must be string`
+    }),
+    phone: Joi.string().regex(phoneRegexp).messages({
+        "string.base": `"phone" must be number. Example <(123) 123-1234>`,
+        "string.pattern.base": `"phone" not be valid. Example valid <(123) 123-1234>`
+    }),
+    favorite: Joi.boolean(),
+})
 
-export async function addContact(data) {
-    // ...твій код. Повертає об'єкт доданого контакту. 
-    const contacts = await listContacts();
-    const newContact = { // створюю новий обєкт контакту (...data спеціально якщо даних буде більше)
-        id: nanoid(),
-        ...data,
-    };
-    contacts.push(newContact);
-    await updateContacts(contacts) // перезаписуємо файл 
-    return newContact;
-}
+const Contact = model("contact", contactSchema);
 
-export const updateContactById = async (contactId, data) => {
-    const contacts = await listContacts();
-    const index = contacts.findIndex(item => item.id === contactId);
-    if (index === -1) {
-        return null;
-    }
-    contacts[index] = { ...contacts[index], ...data };
-    await updateContacts(contacts);
-    return contacts[index];
-}
+export default Contact;
