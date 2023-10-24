@@ -2,11 +2,9 @@ import Contact from "../models/contacts.js";
 
 import { HttpError } from "../helpers/index.js";
 
-import { contactAddSchema, contactUpdateSchema } from "../models/contacts.js";
-
 import {ctrlWrapper} from "../decorators/index.js"
 
-const getAll = async (req, res, next) => {
+const getAll = async (req, res, ) => {
         const result = await Contact.find(); // отримуємо список контактів вже з мангуса
         res.json(result);
 }
@@ -22,19 +20,11 @@ const getAll = async (req, res, next) => {
 // }
 
 const add = async (req, res) => {
-        const { error } = contactAddSchema.validate(req.body);
-        if (error) {
-            throw HttpError(400, error.message);
-        }
         const result = await Contact.create(req.body); // створюєио вже в мангусі
             res.status(201).json(result);
 }
 
 // const updateById = async (req, res) => {
-//         const { error } = contactUpdateSchema.validate(req.body);
-//         if (error) {
-//             throw HttpError(400, error.message);
-//         }
 //         const { id } = req.params;
 //         const result = await contactService.updateContactById(id, req.body);
 //         if (!result) {
