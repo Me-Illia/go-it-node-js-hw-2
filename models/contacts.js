@@ -22,6 +22,10 @@ const contactSchema = new Schema({
         type: Boolean,
         default: false,
     },
+    owner: { //щоб кожен користувач бачив тільки свої контакти
+      type: Schema.Types.ObjectId,
+      ref: 'user',
+    },
 });
 
 contactSchema.post("save", handleSaveError); // хук на ерор для сервера
