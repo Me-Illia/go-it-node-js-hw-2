@@ -6,9 +6,11 @@ import { validateBody } from "../../decorators/index.js";
 
 import { contactAddSchema, contactUpdateSchema, contactUpdateFavoriteSchema } from "../../models/contacts.js";
 
-import { isValidId } from "../../middelewares/index.js";
+import { authenticate, isValidId } from "../../middelewares/index.js";
 
-const router = express.Router()
+const router = express.Router();
+
+router.use(authenticate);
 
 router.get('/', contactsController.getAll);
 

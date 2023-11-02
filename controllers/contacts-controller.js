@@ -4,15 +4,19 @@ import { HttpError } from "../helpers/index.js";
 
 import {ctrlWrapper} from "../decorators/index.js"
 
-const getAll = async (req, res, ) => {
-        const result = await Contact.find(); // отримуємо список контактів вже з мангуса
+const getAll = async (req, res,) => {
+    const { _id: owner } = req.user;
+    const { page = 1, limit = 10 } = req.query; // пагінація
+    const skip = (page - 1) * limit; 
+        const result = await Contact.find({owner}, "_", {skip, limit}).populate("owner", "email"); // отримуємо список контактів вже з мангуса
         res.json(result);
 }
 
 const getById = async (req, res) => {
-        const { id } = req.params; // беремо марштур з Ід
-    // const result = await Contact.findOne({_id: id}); пошук по іншим критеріям
-        const result = await Contact.findById(id);//інший метод монгуса
+    const { id } = req.params; // беремо марштур з Ід
+    const { _id: owner } = req.user;
+    // const result = await Contact.findById(id);//інший метод монгуса
+    const result = await Contact.findOne({_id: id, owner});
         if (!result) {
             throw HttpError(404); 
         }
@@ -20,13 +24,16 @@ const getById = async (req, res) => {
 }
 
 const add = async (req, res) => {
-        const result = await Contact.create(req.body); // створюєио вже в мангусі
+    const { _id: owner } = req.user; // отримали айді власника
+        const result = await Contact.create({...req.body, owner}); // створюєио вже в мангусі
             res.status(201).json(result);
 }
 
 const updateById = async (req, res) => {
-        const { id } = req.params;
-        const result = await Contact.findByIdAndUpdate(id, req.body); //(+ доадли хук параметру для оновлення бо за замовчуванням не оновлує)
+    const { id } = req.params;
+    const { _id: owner } = req.user;
+    // const result = await Contact.findByIdAndUpdate(id, req.body); //(+ доадли хук параметру для оновлення бо за замовчуванням не оновлує)
+        const result = await Contact.findOneAndUpdate({_id: id, owner}, req.body);
         if (!result) {
             throw HttpError(404, error.message);
         }
@@ -35,8 +42,10 @@ const updateById = async (req, res) => {
 }
 
 const deleteById = async (req, res) => {
-        const { id } = req.params;
-        const result = await Contact.findByIdAndDelete(id);
+    const { id } = req.params;
+    const { _id: owner } = req.user;
+    // const result = await Contact.findByIdAndDelete(id);
+    const result = await Contact.findOneAndDelete({_id, owner});
         if (!result) {
             throw HttpError(404, error.message)
         }

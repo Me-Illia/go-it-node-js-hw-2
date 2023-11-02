@@ -23,7 +23,7 @@ const userSchema = new Schema({
     enum: subStatus,
     default: "starter"
   },
-  token: String
+  token: String,
 }, { versionKey: false, timestamps: true })
 
 userSchema.post("save", handleSaveError);

@@ -23,8 +23,9 @@ const contactSchema = new Schema({
         default: false,
     },
     owner: { //щоб кожен користувач бачив тільки свої контакти
-      type: Schema.Types.ObjectId,
-      ref: 'user',
+        type: Schema.Types.ObjectId,
+        ref: 'user',
+        required: true,
     },
 });
 

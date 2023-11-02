@@ -1,12 +1,11 @@
 import express from "express";
 import logger from "morgan";
 import cors from "cors";
-import dotenv from "dotenv"; // можливо записати в 1 вираз <import from "dotenv/config">
+import "dotenv/config";
 
 import authRouter from "./routes/api/auth-router.js";
 import contactsRouter from "./routes/api/contacts-router.js";
 
-dotenv.config(); // -
 
 const app = express();
 
