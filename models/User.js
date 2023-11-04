@@ -24,7 +24,10 @@ const userSchema = new Schema({
     default: "starter"
   },
   token: String,
-}, { versionKey: false, timestamps: true })
+}, { versionKey: false, timestamps: true }, 
+{
+  avatarURL: String,
+})
 
 userSchema.post("save", handleSaveError);
 userSchema.pre("findOneAndUpdate", preUpdate);
