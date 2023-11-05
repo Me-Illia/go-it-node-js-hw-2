@@ -7,7 +7,7 @@ import { HttpError } from "../helpers/index.js";
 
 import { ctrlWrapper } from "../decorators/index.js"
 
-const avatarPath = path.resolve("public", "avatars");
+export const avatarPath = path.resolve("public", "avatars");
 
 const getAll = async (req, res,) => {
     const { _id: owner } = req.user;
