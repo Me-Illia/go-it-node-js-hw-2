@@ -23,15 +23,12 @@ const userSchema = new Schema({
     enum: subStatus,
     default: "starter"
   },
-  token: String,
-  verify: {
-    type: Boolean,
-    default: false,
-  },
-  verificationCode: {
+   avatarURL: {
     type: String,
-  }
-}, { versionKey: false, timestamps: true })
+    required: true
+  },
+  token: String,
+}, { versionKey: false, timestamps: true });
 
 userSchema.post("save", handleSaveError);
 userSchema.pre("findOneAndUpdate", preUpdate);

@@ -6,7 +6,7 @@ import { validateBody } from "../../decorators/index.js";
 
 import { contactAddSchema, contactUpdateSchema, contactUpdateFavoriteSchema } from "../../models/contacts.js";
 
-import { authenticate, isValidId } from "../../middelewares/index.js";
+import { authenticate, upload, isValidId } from "../../middelewares/index.js";
 
 const router = express.Router();
 
@@ -16,7 +16,9 @@ router.get('/', contactsController.getAll);
 
 router.get('/:id', isValidId, contactsController.getById);
 
-router.post('/', validateBody(contactAddSchema), contactsController.add);
+// upload.fields({name: "poster", maxCount: 1}) - якщо в кількох полях
+// upload.array("poster", 9) - якщо в 1-му полі кілька файлів
+router.post('/', upload.single("avatar"), validateBody(contactAddSchema), contactsController.add);
 
 router.delete('/:id', isValidId, contactsController.deleteById);
 
