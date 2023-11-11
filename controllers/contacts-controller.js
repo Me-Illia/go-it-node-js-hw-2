@@ -1,13 +1,8 @@
-import fs from "fs/promises";
-import path from "path";
-
 import Contact from "../models/contacts.js";
 
 import { HttpError } from "../helpers/index.js";
 
-import { ctrlWrapper } from "../decorators/index.js"
-
-export const avatarPath = path.resolve("public", "avatars");
+import {ctrlWrapper} from "../decorators/index.js"
 
 const getAll = async (req, res,) => {
     const { _id: owner } = req.user;
@@ -30,11 +25,7 @@ const getById = async (req, res) => {
 
 const add = async (req, res) => {
     const { _id: owner } = req.user; // отримали айді власника
-    const { path: oldPath, filename } = req.file;
-    const newPath = path.join(avatarPath, filename);
-    await fs.rename(oldPath, newPath);
-    const avatar = path.join("avatars", filename);
-        const result = await Contact.create({...req.body, avatar, owner}); // створюєио вже в мангусі
+        const result = await Contact.create({...req.body, owner}); // створюєио вже в мангусі
             res.status(201).json(result);
 }
 

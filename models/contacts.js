@@ -22,9 +22,6 @@ const contactSchema = new Schema({
         type: Boolean,
         default: false,
     },
-    avatar: {
-        type: String,
-    },
     owner: { //щоб кожен користувач бачив тільки свої контакти
         type: Schema.Types.ObjectId,
         ref: 'user',
