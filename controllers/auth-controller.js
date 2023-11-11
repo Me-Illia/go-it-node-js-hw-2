@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import gravatar from "gravatar";
 import fs from "fs/promises";
 import path from "path";
+import { nanoid } from "nanoid";
 
 import User from "../models/User.js";
 
@@ -23,9 +24,19 @@ const signup = async (req, res) => {
     }
 
     const hashPassword = await bcrypt.hash(password, 10); // хешуємо
+
+    const verificationCode = nanoid();
+
     const avatarURL = gravatar.url(email); // тимчасова аватарка
 
-    const newUser = await User.create({...req.body, password: hashPassword, avatarURL}); // save hash pass
+    const newUser = await User.create({...req.body, password: hashPassword, avatarURL, verificationCode}); // save hash pass
+
+    const verifyEmail = {
+        to: email,
+        subject: "Verify email",
+        html: `<a target="_blank" href="http://localhost:3000/api/auth/verify/${verificationCode}">Click to verify email</a>`
+    }
+    await sendEmail(verifyEmail);
 
     res.status(201).json({
         username: newUser.username,
